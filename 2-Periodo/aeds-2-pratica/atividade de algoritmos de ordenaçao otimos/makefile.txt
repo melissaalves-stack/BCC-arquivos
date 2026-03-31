@@ -1,0 +1,103 @@
+# Makefile para compilação do projeto de Algoritmos de Ordenação Ótimos
+
+# Compilador e flags
+CC = gcc
+CFLAGS = -Wall -Wextra -O2 -std=c11
+LDFLAGS = -lm
+
+# Arquivos
+TARGET = ordenacao
+SOURCES = ordenacao.c
+HEADERS = ordenacao.h
+OBJECTS = $(SOURCES:.c=.o)
+
+# Regra padrão
+all: $(TARGET)
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "✓ Compilação concluída com sucesso!"
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "Execute com: ./$(TARGET)"
+	@echo ""
+
+# Compilar o executável
+$(TARGET): $(OBJECTS)
+	@echo "🔗 Linkando $(TARGET)..."
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS) $(LDFLAGS)
+
+# Compilar arquivos objeto
+%.o: %.c $(HEADERS)
+	@echo "🔨 Compilando $<..."
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Executar o programa
+run: $(TARGET)
+	@echo "▶ Executando $(TARGET)..."
+	@echo ""
+	./$(TARGET)
+
+# Compilar com informações de debug
+debug: CFLAGS += -g -DDEBUG
+debug: clean $(TARGET)
+	@echo "✓ Compilado em modo DEBUG"
+
+# Limpar arquivos compilados
+clean:
+	@echo "🧹 Limpando arquivos compilados..."
+	rm -f $(OBJECTS) $(TARGET)
+	@echo "✓ Limpeza concluída!"
+
+# Limpar e recompilar
+rebuild: clean all
+
+# Verificar vazamentos de memória com valgrind
+valgrind: $(TARGET)
+	@echo "🔍 Executando valgrind para detecção de vazamentos..."
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(TARGET)
+
+# Análise de performance com time
+benchmark: $(TARGET)
+	@echo "⏱️  Executando benchmark de performance..."
+	time ./$(TARGET)
+
+# Verificar sintaxe sem compilar
+check:
+	@echo "✓ Verificando sintaxe..."
+	$(CC) $(CFLAGS) -fsyntax-only $(SOURCES)
+	@echo "✓ Sintaxe OK!"
+
+# Mostrar informações sobre o projeto
+info:
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "  PROJETO: Algoritmos de Ordenação Ótimos O(n log n)"
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "Compilador: $(CC)"
+	@echo "Flags: $(CFLAGS)"
+	@echo "Target: $(TARGET)"
+	@echo "Arquivos fonte: $(SOURCES)"
+	@echo "Headers: $(HEADERS)"
+	@echo ""
+	@echo "Algoritmos implementados:"
+	@echo "  • Merge Sort - Divisão e Conquista"
+	@echo "  • Quick Sort - Divisão e Conquista"
+	@echo "  • Heap Sort - Baseado em Heap"
+	@echo ""
+	@echo "Comandos disponíveis:"
+	@echo "  make         - Compila o projeto"
+	@echo "  make run     - Compila e executa"
+	@echo "  make debug   - Compila com símbolos de debug"
+	@echo "  make clean   - Remove arquivos compilados"
+	@echo "  make rebuild - Limpa e recompila"
+	@echo "  make valgrind - Verifica vazamentos de memória"
+	@echo "  make benchmark - Mede tempo de execução"
+	@echo "  make check   - Verifica sintaxe"
+	@echo "  make info    - Mostra esta mensagem"
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# Criar arquivo zip para entrega
+zip: clean
+	@echo "📦 Criando arquivo para entrega..."
+	zip -r ordenacao_projeto.zip *.c *.h Makefile README.md 2>/dev/null || zip -r ordenacao_projeto.zip *.c *.h Makefile
+	@echo "✓ Arquivo ordenacao_projeto.zip criado!"
+
+# Evitar conflitos com arquivos de mesmo nome
+.PHONY: all run debug clean rebuild valgrind benchmark check info zip
